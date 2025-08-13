@@ -5,11 +5,69 @@
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <script src="./webauthn.js" type="module"></script>
     <title>WebAuthn Example</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 20px;
+      }
+      textarea {
+        width: 100%;
+        font-family: monospace;
+      }
+      button {
+        margin-top: 10px;
+      }
+      p {
+        margin: 15px 0;
+      }
+      span {
+        font-weight: bold;
+        word-break: break-all;
+      }
+    </style>
   </head>
   <body>
-    <h1>WebAuthn Example</h1>
-    <p>This is a simple example of a WebAuthn implementation.</p>
-    <button id="register">Register</button>
-    <button id="login">Login</button>
+    <textarea id="creation-option" rows="28" cols="40">
+{
+    "challenge": [7, 8, 9, 10, 11], 
+    "rp": {
+      "name": "Example Corp"
+    },
+    "user": {
+      "id": [1, 2, 3, 4, 5, 3],
+      "name": "user2@example.com",
+      "displayName": "Example User"
+    },
+    "authenticatorSelection": {
+      "residentKey": "required"
+    },
+    "pubKeyCredParams": [
+      {
+        "type": "public-key",
+        "alg": -7
+      },
+      {
+        "type": "public-key",
+        "alg": -8
+      },
+      {
+        "type": "public-key",
+        "alg": -257
+      }
+    ]
+}
+</textarea
+    ><br />
+    <button id="register">注册</button><br />
+    <p>生成的公钥:<br /><span id="public-key"></span></p>
+    <p>公钥类型:<br /><span id="public-key-type"></span></p>
+    <p>异常信息:<br /><span id="create-error-message"></span></p>
+    <button id="login">登录</button><br />
+    <p>Client数据:<br /><span id="client-data"></span></p>
+    <p>Authenticator数据:<br /><span id="authenticator-data"></span></p>
+    <p>签名数据:<br /><span id="signature-data"></span></p>
+    <p>异常信息:<br /><span id="login-error-message"></span></p>
+    <button id="verify">校验</button>
+    <p>验证结果:<br /><span id="verify-result"></span></p>
   </body>
 </html>
