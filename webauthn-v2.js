@@ -21,8 +21,11 @@ document.getElementById("register").addEventListener("click", async () => {
       })
     );
     const credJson = credential.toJSON();
+    console.log("Credential JSON:", credJson);
+    const publicKeyId = credJson.id;
     const publicKey = credJson.response.publicKey;
     const publicKeyType = credJson.response.publicKeyAlgorithm;
+    document.getElementById("public-key-id").textContent = publicKeyId;
     document.getElementById("public-key").textContent = publicKey;
     document.getElementById("public-key-type").textContent = publicKeyType;
   } catch (error) {
@@ -33,12 +36,30 @@ document.getElementById("register").addEventListener("click", async () => {
 
 document.getElementById("login").addEventListener("click", async () => {
   try {
-    /** @type {PublicKeyCredentialRequestOptions} */
-    const publicKey = {
-      challenge: new Uint8Array([7, 8, 9, 10, 11]),
-    };
+    /** @type {CredentialRequestOptions} */
+    const rqOptions = JSON.parse(
+      /** @type {HTMLTextAreaElement} */ (
+        document.getElementById("request-option")
+      ).value
+    );
+
+    rqOptions.publicKey.challenge = Uint8Array.from(
+      // @ts-ignore
+      rqOptions.publicKey.challenge
+    );
+
+    const pkId = base64urlToUint8Array(
+      document.getElementById("public-key-id").textContent
+    );
+    rqOptions.publicKey.allowCredentials = [
+      {
+        id: pkId,
+        type: "public-key",
+      },
+    ];
+
     const assertion = /** @type {PublicKeyCredential} */ (
-      await navigator.credentials.get({ publicKey, mediation: "required" })
+      await navigator.credentials.get(rqOptions)
     );
     const assertionJson = assertion.toJSON();
     document.getElementById("client-data").textContent =
@@ -81,8 +102,6 @@ document.getElementById("verify").addEventListener("click", async () => {
   const clientDataHash = new Uint8Array(
     await crypto.subtle.digest("SHA-256", clientData)
   );
-  console.log("Client Data Hash:", clientDataHash);
-  console.log("Authenticator Data:", authenticatorData);
   const toVerify = concat(authenticatorData, clientDataHash);
   const v = await crypto.subtle.verify(
     {
