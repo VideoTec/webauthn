@@ -10,7 +10,9 @@ document.getElementById("register").addEventListener("click", async () => {
       ).value
     );
 
+    // @ts-ignore
     creationOptions.challenge = Uint8Array.from(creationOptions.challenge);
+    // @ts-ignore
     creationOptions.user.id = Uint8Array.from(creationOptions.user.id);
 
     const credential = /** @type {PublicKeyCredential} */ (
