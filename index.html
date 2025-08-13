@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="./webauthn-v2.js" type="module"></script>
+    <script src="./webauthn-v3.js" type="module"></script>
     <title>WebAuthn Example</title>
     <style>
       body {
@@ -35,7 +35,7 @@
     },
     "user": {
       "id": [1, 2, 3, 4, 5, 3],
-      "name": "user2@example.com",
+      "name": "user@example.com",
       "displayName": "Example User"
     },
     "authenticatorSelection": {
@@ -75,7 +75,8 @@
 }
     </textarea
     ><br />
-    <button id="login">登录</button><br />
+    <button id="login">登录</button
+    ><input type="checkbox" id="witch-credential" checked />使用凭证<br />
     <p>Client数据:<br /><span id="client-data"></span></p>
     <p>Authenticator数据:<br /><span id="authenticator-data"></span></p>
     <p>签名数据:<br /><span id="signature-data"></span></p>

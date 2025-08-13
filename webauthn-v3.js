@@ -1,8 +1,5 @@
 document.getElementById("register").addEventListener("click", async () => {
   try {
-    const creationOptionsT = /** @type {HTMLTextAreaElement} */ (
-      document.getElementById("creation-option")
-    );
     /** @type {PublicKeyCredentialCreationOptions} */
     const creationOptions = JSON.parse(
       /** @type {HTMLTextAreaElement} */ (
@@ -36,6 +33,7 @@ document.getElementById("register").addEventListener("click", async () => {
 
 document.getElementById("login").addEventListener("click", async () => {
   try {
+    document.getElementById("login-error-message").textContent = "";
     /** @type {CredentialRequestOptions} */
     const rqOptions = JSON.parse(
       /** @type {HTMLTextAreaElement} */ (
@@ -51,12 +49,19 @@ document.getElementById("login").addEventListener("click", async () => {
     const pkId = base64urlToUint8Array(
       document.getElementById("public-key-id").textContent
     );
-    rqOptions.publicKey.allowCredentials = [
-      {
-        id: pkId,
-        type: "public-key",
-      },
-    ];
+
+    const withCredentials = /** @type {HTMLInputElement} */ (
+      document.getElementById("witch-credential")
+    ).checked;
+
+    if (withCredentials) {
+      rqOptions.publicKey.allowCredentials = [
+        {
+          id: pkId,
+          type: "public-key",
+        },
+      ];
+    }
 
     const assertion = /** @type {PublicKeyCredential} */ (
       await navigator.credentials.get(rqOptions)
