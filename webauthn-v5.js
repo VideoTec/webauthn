@@ -31,7 +31,34 @@ document.getElementById("register").addEventListener("click", async () => {
   }
 });
 
-document.getElementById("login").addEventListener("click", async () => {
+document.getElementById("login").addEventListener("click", () => {
+  login();
+});
+
+window.onload = () => {
+  login();
+  let webauthnCapabilities = "";
+  if (!window.PublicKeyCredential) {
+    webauthnCapabilities += "不支持WebAuthn API\n";
+  } else {
+    if (
+      window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable
+    ) {
+      webauthnCapabilities += "支持平台身份验证器\n";
+    } else {
+      webauthnCapabilities += "不支持平台身份验证器\n";
+    }
+    if (window.PublicKeyCredential.isConditionalMediationAvailable) {
+      webauthnCapabilities += "支持条件介入\n";
+    } else {
+      webauthnCapabilities += "不支持条件介入\n";
+    }
+  }
+  document.getElementById("webauthn-feature").textContent =
+    webauthnCapabilities;
+};
+
+async function login() {
   try {
     document.getElementById("login-error-message").textContent = "";
     /** @type {CredentialRequestOptions} */
@@ -80,7 +107,7 @@ document.getElementById("login").addEventListener("click", async () => {
     console.error("Error during login:", error);
     document.getElementById("login-error-message").textContent = error.message;
   }
-});
+}
 
 document.getElementById("verify").addEventListener("click", async () => {
   const clientData = base64urlToUint8Array(

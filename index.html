@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="./webauthn-v4.js" type="module"></script>
+    <script src="./webauthn-v5.js" type="module"></script>
     <title>WebAuthn Example</title>
     <style>
       body {
@@ -15,7 +15,7 @@
         font-family: monospace;
       }
       button {
-        margin-top: 10px;
+        margin-top: 10px 5px;
       }
       p {
         margin: 15px 0;
@@ -23,10 +23,15 @@
       span {
         font-weight: bold;
         word-break: break-all;
+        margin: 0 5px;
+      }
+      input {
+        margin: 10px 5px;
       }
     </style>
   </head>
   <body>
+    <p>Webauthn功能:<span id="webauthn-feature"></span></p>
     <textarea id="creation-option" rows="28" cols="40">
 {
     "challenge": [7, 8, 9, 10, 11], 
@@ -65,7 +70,7 @@
     <p>异常信息:<br /><span id="create-error-message"></span></p>
     <textarea id="request-option" rows="10" cols="40">
 {
-    "mediation": "required",
+    "mediation": "conditional",
     "publicKey": {
         "challenge": [7, 8, 9, 10, 11],
         "allowCredentials": [],
@@ -76,7 +81,13 @@
     </textarea
     ><br />
     <button id="login">登录</button
-    ><input type="checkbox" id="witch-credential" checked />使用凭证<br />
+    ><input type="checkbox" id="witch-credential" />使用凭证<br />
+    <input
+      type="text"
+      name="username"
+      autocomplete="username webauthn"
+      placeholder="请输入用户名"
+    /><br />
     <p>userHandle:<br /><span id="user-handle"></span></p>
     <p>Client数据:<br /><span id="client-data"></span></p>
     <p>Authenticator数据:<br /><span id="authenticator-data"></span></p>
