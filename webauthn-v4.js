@@ -67,6 +67,9 @@ document.getElementById("login").addEventListener("click", async () => {
       await navigator.credentials.get(rqOptions)
     );
     const assertionJson = assertion.toJSON();
+    console.log("Assertion JSON:", assertionJson);
+    document.getElementById("user-handle").textContent =
+      assertionJson.response.userHandle;
     document.getElementById("client-data").textContent =
       assertionJson.response.clientDataJSON;
     document.getElementById("authenticator-data").textContent =
