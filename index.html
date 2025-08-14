@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <script src="./webauthn-v5.js" type="module"></script>
+    <script src="./webauthn-v6.js" type="module"></script>
     <title>WebAuthn Example</title>
     <style>
       body {
@@ -27,6 +27,7 @@
       }
       input {
         margin: 10px 5px;
+        width: 50%;
       }
     </style>
   </head>
@@ -59,7 +60,10 @@
         "type": "public-key",
         "alg": -257
       }
-    ]
+    ],
+    "extensions": {
+      "credProps": true
+    }
 }
 </textarea
     ><br />
@@ -67,6 +71,7 @@
     <p>生成的公钥ID:<br /><span id="public-key-id"></span></p>
     <p>生成的公钥:<br /><span id="public-key"></span></p>
     <p>公钥类型:<br /><span id="public-key-type"></span></p>
+    <p>credProps.rk:<br /><span id="credProps-rk"></span></p>
     <p>异常信息:<br /><span id="create-error-message"></span></p>
     <textarea id="request-option" rows="10" cols="40">
 {
@@ -86,7 +91,7 @@
       type="text"
       name="username"
       autocomplete="username webauthn"
-      placeholder="请输入用户名"
+      placeholder="先点击登录。然后再点击这里"
     /><br />
     <p>userHandle:<br /><span id="user-handle"></span></p>
     <p>Client数据:<br /><span id="client-data"></span></p>

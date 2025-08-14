@@ -22,9 +22,21 @@ document.getElementById("register").addEventListener("click", async () => {
     const publicKeyId = credJson.id;
     const publicKey = credJson.response.publicKey;
     const publicKeyType = credJson.response.publicKeyAlgorithm;
+
+    let credPropsMsg = "没有相关信息";
+    if (credJson.clientExtensionResults.credProps) {
+      credPropsMsg = "credProps: ";
+      if (credJson.clientExtensionResults.credProps.rk === undefined) {
+        credPropsMsg += "没有rk";
+      } else {
+        credPropsMsg += "rk: " + credJson.clientExtensionResults.credProps.rk;
+      }
+    }
+
     document.getElementById("public-key-id").textContent = publicKeyId;
     document.getElementById("public-key").textContent = publicKey;
     document.getElementById("public-key-type").textContent = publicKeyType;
+    document.getElementById("credProps-rk").textContent = credPropsMsg;
   } catch (error) {
     console.error("Error during registration:", error);
     document.getElementById("create-error-message").textContent = error.message;
@@ -36,7 +48,7 @@ document.getElementById("login").addEventListener("click", () => {
 });
 
 window.onload = () => {
-  login();
+  // login();
   let webauthnCapabilities = "";
   if (!window.PublicKeyCredential) {
     webauthnCapabilities += "不支持WebAuthn API\n";
