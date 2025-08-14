@@ -47,20 +47,24 @@ document.getElementById("login").addEventListener("click", () => {
   login();
 });
 
-window.onload = () => {
+window.onload = async () => {
   // login();
+  console.log(
+    "WebAuthn Capabilities:",
+    await window.PublicKeyCredential.getClientCapabilities()
+  );
   let webauthnCapabilities = "";
   if (!window.PublicKeyCredential) {
     webauthnCapabilities += "不支持WebAuthn API\n";
   } else {
     if (
-      window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable
+      await window.PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable()
     ) {
       webauthnCapabilities += "支持平台身份验证器\n";
     } else {
       webauthnCapabilities += "不支持平台身份验证器\n";
     }
-    if (window.PublicKeyCredential.isConditionalMediationAvailable) {
+    if (await window.PublicKeyCredential.isConditionalMediationAvailable()) {
       webauthnCapabilities += "支持条件介入\n";
     } else {
       webauthnCapabilities += "不支持条件介入\n";
