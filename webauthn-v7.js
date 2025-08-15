@@ -125,6 +125,31 @@ async function login() {
   }
 }
 
+/**
+ * 为 web cryptography API 的算法参数映射 COSE alg
+ * @param {number} alg
+ * @returns
+ */
+function algoParamsFromCoseAlg(alg) {
+  switch (alg) {
+    case -7:
+      return {
+        import: { name: "ECDSA", namedCurve: "P-256" },
+        verify: { name: "ECDSA", hash: "SHA-256" },
+      }; // ES256
+    case -257:
+      return {
+        import: { name: "RSASSA-PKCS1-v1_5", hash: "SHA-256" },
+        verify: { name: "RSASSA-PKCS1-v1_5" },
+      }; // RS256
+    case -8:
+      return { import: { name: "Ed25519" }, verify: { name: "Ed25519" } }; // EdDSA(Ed25519)
+    // 如需支持更多：ES384(-35/-38)、RS384(-258)、RS512(-259) 等
+    default:
+      throw new Error(`Unsupported COSE alg: ${alg}`);
+  }
+}
+
 document.getElementById("verify").addEventListener("click", async () => {
   const clientData = base64urlToUint8Array(
     document.getElementById("client-data").textContent
@@ -132,21 +157,26 @@ document.getElementById("verify").addEventListener("click", async () => {
   const authenticatorData = base64urlToUint8Array(
     document.getElementById("authenticator-data").textContent
   );
-  const signature = base64urlToUint8Array(
+  let signature = base64urlToUint8Array(
     document.getElementById("signature-data").textContent
   );
-  const signatureRaw = convertASN1toRaw(signature);
   const publicKey = base64urlToUint8Array(
     document.getElementById("public-key").textContent
   );
+  const publicKeyType = Number.parseInt(
+    document.getElementById("public-key-type").textContent
+  );
+
+  const algoParams = algoParamsFromCoseAlg(publicKeyType);
+
+  if (publicKeyType === -7) {
+    signature = convertASN1SignatureToRaw(signature);
+  }
 
   const key = await crypto.subtle.importKey(
     "spki",
     publicKey,
-    {
-      name: "ECDSA",
-      namedCurve: "P-256",
-    },
+    algoParams.import,
     true,
     ["verify"]
   );
@@ -155,18 +185,21 @@ document.getElementById("verify").addEventListener("click", async () => {
   );
   const toVerify = concat(authenticatorData, clientDataHash);
   const v = await crypto.subtle.verify(
-    {
-      name: "ECDSA",
-      hash: { name: "SHA-256" },
-    },
+    algoParams.verify,
     key,
-    signatureRaw,
+    signature,
     toVerify
   );
 
-  document.getElementById("verify-result").textContent = v
-    ? "验证通过"
-    : "验证失败";
+  const verifyResult = v ? "验证通过" : "验证失败";
+
+  document.getElementById("verify-result").textContent = verifyResult;
+
+  alert(
+    `验证结果: ${verifyResult}\n` +
+      `公钥类型: ${publicKeyType}\n` +
+      `签名类型: ${publicKeyType === -7 ? "ASN.1 DER" : "原始格式"}`
+  );
 });
 
 /**
@@ -174,9 +207,8 @@ document.getElementById("verify").addEventListener("click", async () => {
  * @param {Uint8Array} signature
  * @returns {Uint8Array<ArrayBuffer>}
  */
-function convertASN1toRaw(signature) {
+function convertASN1SignatureToRaw(signature) {
   // Convert signature from ASN.1 sequence to "raw" format
-  //   const signature = new Uint8Array(signatureBuffer);
   const rStart = signature[4] === 0 ? 5 : 4;
   const rEnd = rStart + 32;
   const sStart = signature[rEnd + 2] === 0 ? rEnd + 3 : rEnd + 2;
